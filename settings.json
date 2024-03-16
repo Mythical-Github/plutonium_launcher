@@ -3,38 +3,46 @@
         {
             "name": "Call of Duty Modern Warfare III Multiplayer",
             "arg": "iw5mp",
-            "directory": ""
+            "directory": "D:/SteamLibrary/steamapps/common/Call of Duty Modern Warfare 3"
         },
         {
             "name": "Call of Duty World at War Single Player",
             "arg": "t4sp",
-            "directory": ""
+            "directory": "D:/SteamLibrary/steamapps/common/Call of Duty World at War"
         },
         {
             "name": "Call of Duty World at War Multiplayer",
             "arg": "t4mp",
-            "directory": ""
+            "directory": "D:/SteamLibrary/steamapps/common/Call of Duty World at War"
         },
         {
             "name": "Call of Duty Black Ops Single Player",
             "arg": "t5sp",
-            "directory": ""
+            "directory": "D:/SteamLibrary/steamapps/common/Call of Duty Black Ops"
         },
         {
             "name": "Call of Duty Black Ops Multiplayer",
             "arg": "t5mp",
-            "directory": ""
+            "directory": "D:/SteamLibrary/steamapps/common/Call of Duty Black Ops"
         },
         {
             "name": "Call of Duty Black Ops II Single Player",
             "arg": "t6zm",
-            "directory": ""
+            "directory": "D:/SteamLibrary/steamapps/common/Call of Duty Black Ops II"
         },
         {
             "name": "Call of Duty Black Ops II Multiplayer",
             "arg": "t6mp",
-            "directory": ""
+            "directory": "D:/SteamLibrary/steamapps/common/Call of Duty Black Ops II"
         }
     ],
-    "lan_username": "Default"
+    "lan_username": "Mythical",
+    "auto_execute": false,
+    "delay": 2.0,
+    "selected_game": {
+        "arg": "t4sp",
+        "directory": "D:/SteamLibrary/steamapps/common/Call of Duty World at War",
+        "name": "Call of Duty World at War Single Player"
+    },
+    "selected_index": 1
 }

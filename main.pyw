@@ -59,13 +59,19 @@ class GameLauncher(QWidget):
         self.lan_username = lan_username
         self.settings = QSettings("Mythical", "Plutonium Launcher")
         self.initUI()
-        
+
     def initUI(self):
         self.resize(self.settings.value("size", QSize(400, 200)))
         self.move(self.settings.value("pos", QPoint(100, 100)))
-        
+
+        with open('settings.json') as f:
+            data = json.load(f)
+            self.selected_game = data.get('selected_game', self.games[0])
+            self.delay = data.get('delay', 1.0) 
+            self.selected_index = data.get('selected_index', 0)
+
         layout = QVBoxLayout()
-        
+
         for game in self.games:
             button_layout = QHBoxLayout()
             game_button = StyledButton(game["name"])
@@ -83,12 +89,35 @@ class GameLauncher(QWidget):
         self.user_button.setObjectName("UserButton")
         self.user_button.clicked.connect(self.change_username)
         layout.addWidget(self.user_button)
-        
+
+        panel_layout = QHBoxLayout()
+
+        self.game_label = QLabel("Select Game:")
+        panel_layout.addWidget(self.game_label)
+
+        self.game_combobox = QComboBox()
+        panel_layout.addWidget(self.game_combobox)
+
+        self.delay_label = QLabel("Delay:")
+        panel_layout.addWidget(self.delay_label)
+
+        self.delay_spinbox = QDoubleSpinBox()
+        self.delay_spinbox.setSingleStep(0.1)
+        self.delay_spinbox.setValue(float(self.delay))
+        panel_layout.addWidget(self.delay_spinbox)
+
+        self.auto_execute_checkbox = QCheckBox("Auto Execute")
+        self.auto_execute_checkbox.setChecked(self.settings.value("auto_execute", True, type=bool))
+        self.auto_execute_checkbox.stateChanged.connect(self.updateSettings)
+        panel_layout.addWidget(self.auto_execute_checkbox)
+
+        layout.addLayout(panel_layout)
+
         self.setLayout(layout)
         self.setWindowTitle('Plutonium Launcher')
 
         self.setWindowIcon(QIcon('assets/plutonium_icon.ico'))
-        
+
         self.setStyleSheet("""
             QWidget {
                 background-color: #4d0000;
@@ -108,14 +137,70 @@ class GameLauncher(QWidget):
                 min-height: 25px;
             }
         """)
+
+        self.populateGameComboBox()
         
+        for index, game in enumerate(self.games):
+            if game == self.selected_game:
+                self.game_combobox.setCurrentIndex(index)
+                break
+
+        self.game_combobox.setCurrentIndex(self.selected_index)
+        self.delay_spinbox.valueChanged.connect(self.updateDelay)
+        self.game_combobox.currentIndexChanged.connect(self.updateSelectedGame)
         self.show()
+        self.updateSettings()
 
+    def updateSelectedGame(self, index):
+        self.selected_index = index
+        self.settings.setValue("selected_index", index)
 
-    def closeEvent(self, event):
-        self.settings.setValue("size", self.size())
-        self.settings.setValue("pos", self.pos())
-        event.accept()
+        with open('settings.json', 'r+') as f:
+            data = json.load(f)
+            data["selected_index"] = index
+            f.seek(0)
+            json.dump(data, f, indent=4)
+            f.truncate()
+
+    def updateDelay(self, value):
+        self.delay = value
+        self.settings.setValue("delay", value)
+
+        with open('settings.json', 'r+') as f:
+            data = json.load(f)
+            data["delay"] = value
+            f.seek(0)
+            json.dump(data, f, indent=4)
+            f.truncate()
+
+    def populateGameComboBox(self):
+        for index, game in enumerate(self.games):
+            self.game_combobox.addItem(game["name"], game)
+
+    def updateSettings(self):
+        self.settings.setValue("auto_execute", self.auto_execute_checkbox.isChecked())
+        self.settings.setValue("delay", self.delay_spinbox.value())
+        selected_game_index = self.game_combobox.currentIndex()
+        selected_game_data = self.game_combobox.itemData(selected_game_index)
+
+        with open('settings.json', 'r+') as f:
+            data = json.load(f)
+            data["auto_execute"] = self.auto_execute_checkbox.isChecked()
+            data["delay"] = self.delay_spinbox.value()
+            data["selected_game"] = selected_game_data
+            f.seek(0)
+            json.dump(data, f, indent=4)
+            f.truncate()
+
+        if self.auto_execute_checkbox.isChecked():
+            QTimer.singleShot(int(self.delay * 1000), self.launchSelectedGame)
+
+    def launchSelectedGame(self):
+        selected_game_data = self.game_combobox.currentData()
+        if selected_game_data:
+            arg = selected_game_data.get("arg")
+            directory = selected_game_data.get("directory", "")
+            self.launchGame(arg, directory)
 
     def launchGame(self, arg, directory):
         if not directory:
@@ -128,10 +213,11 @@ class GameLauncher(QWidget):
                         break
                 with open('settings.json', 'w') as f:
                     json.dump({'games': self.games, 'lan_username': self.lan_username}, f, indent=4)
-        
+
         os.chdir(os.path.join(os.environ['LOCALAPPDATA'], 'Plutonium'))
         cmd = [f'{os.getcwd()}/bin/plutonium-bootstrapper-win32.exe', arg, directory, '+name', self.lan_username, '-lan']
         subprocess.Popen(cmd)
+        self.close()
 
     def setGameDirectory(self, game):
         selected_directory = QFileDialog.getExistingDirectory(self, f"Select Directory for {game['arg']}", "")
