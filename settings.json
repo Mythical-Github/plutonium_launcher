@@ -37,12 +37,12 @@
         }
     ],
     "lan_username": "Mythical",
-    "auto_execute": false,
-    "delay": 2.0,
+    "auto_execute": true,
+    "delay": 1.0,
     "selected_game": {
-        "arg": "t4sp",
-        "directory": "D:/SteamLibrary/steamapps/common/Call of Duty World at War",
-        "name": "Call of Duty World at War Single Player"
+        "arg": "t6zm",
+        "directory": "D:/SteamLibrary/steamapps/common/Call of Duty Black Ops II",
+        "name": "Call of Duty Black Ops II Single Player"
     },
-    "selected_index": 1
+    "selected_index": 5
 }

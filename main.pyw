@@ -234,6 +234,10 @@ class GameLauncher(QWidget):
             with open('settings.json', 'w') as f:
                 json.dump({'games': self.games, 'lan_username': self.lan_username}, f, indent=4)
 
+    def closeEvent(self, event):
+        self.settings.setValue("size", self.size())
+        self.settings.setValue("pos", self.pos())
+
 def main():
     with open('settings.json') as f:
         data = json.load(f)
