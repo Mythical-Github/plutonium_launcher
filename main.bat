@@ -2,6 +2,6 @@
 
 cd %~dp0
 
-main.pyw
+start /b main.pyw
 
 exit /b
