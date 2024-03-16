@@ -2,9 +2,9 @@ import os
 import sys
 import json
 import subprocess
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 
 color_1 = "color: white; border: 1px solid teal"
 style_1 = f"background: #222222; {color_1};"
