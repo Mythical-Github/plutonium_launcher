@@ -69,6 +69,7 @@ class GameLauncher(QWidget):
             self.selected_game = data.get('selected_game', self.games[0])
             self.delay = data.get('delay', 1.0) 
             self.selected_index = data.get('selected_index', 0)
+            self.global_args = data.get('global_args', [])
 
         layout = QVBoxLayout()
 
@@ -89,6 +90,34 @@ class GameLauncher(QWidget):
         self.user_button.setObjectName("UserButton")
         self.user_button.clicked.connect(self.change_username)
         layout.addWidget(self.user_button)
+
+        global_args_scroll = QScrollArea()
+        global_args_widget = QWidget()
+        global_args_layout = QVBoxLayout(global_args_widget)
+        global_args_scroll.setWidgetResizable(True)
+
+        for arg in self.global_args:
+            arg_button = StyledButton(arg)
+            global_args_layout.addWidget(arg_button)
+
+        global_args_scroll.setWidget(global_args_widget)
+        global_args_scroll.setMaximumHeight(80)
+        
+        add_arg_button = QPushButton("Add Global Argument")
+        add_arg_button.clicked.connect(self.addGlobalArg)
+
+        remove_arg_button = QPushButton("Remove Global Argument")
+        remove_arg_button.clicked.connect(self.removeGlobalArg)
+
+        button_layout = QVBoxLayout()
+        button_layout.addWidget(add_arg_button)
+        button_layout.addWidget(remove_arg_button)
+
+        main_layout = QHBoxLayout()
+        main_layout.addWidget(global_args_scroll)
+        main_layout.addLayout(button_layout)
+
+        layout.addLayout(main_layout)
 
         panel_layout = QHBoxLayout()
 
@@ -139,7 +168,7 @@ class GameLauncher(QWidget):
         """)
 
         self.populateGameComboBox()
-        
+
         for index, game in enumerate(self.games):
             if game == self.selected_game:
                 self.game_combobox.setCurrentIndex(index)
@@ -154,24 +183,12 @@ class GameLauncher(QWidget):
     def updateSelectedGame(self, index):
         self.selected_index = index
         self.settings.setValue("selected_index", index)
-
-        with open('settings.json', 'r+') as f:
-            data = json.load(f)
-            data["selected_index"] = index
-            f.seek(0)
-            json.dump(data, f, indent=4)
-            f.truncate()
+        self.saveSettings()
 
     def updateDelay(self, value):
         self.delay = value
         self.settings.setValue("delay", value)
-
-        with open('settings.json', 'r+') as f:
-            data = json.load(f)
-            data["delay"] = value
-            f.seek(0)
-            json.dump(data, f, indent=4)
-            f.truncate()
+        self.saveSettings()
 
     def populateGameComboBox(self):
         for index, game in enumerate(self.games):
@@ -179,21 +196,7 @@ class GameLauncher(QWidget):
 
     def updateSettings(self):
         self.settings.setValue("auto_execute", self.auto_execute_checkbox.isChecked())
-        self.settings.setValue("delay", self.delay_spinbox.value())
-        selected_game_index = self.game_combobox.currentIndex()
-        selected_game_data = self.game_combobox.itemData(selected_game_index)
-
-        with open('settings.json', 'r+') as f:
-            data = json.load(f)
-            data["auto_execute"] = self.auto_execute_checkbox.isChecked()
-            data["delay"] = self.delay_spinbox.value()
-            data["selected_game"] = selected_game_data
-            f.seek(0)
-            json.dump(data, f, indent=4)
-            f.truncate()
-
-        if self.auto_execute_checkbox.isChecked():
-            QTimer.singleShot(int(self.delay * 1000), self.launchSelectedGame)
+        self.saveSettings()
 
     def launchSelectedGame(self):
         selected_game_data = self.game_combobox.currentData()
@@ -211,11 +214,14 @@ class GameLauncher(QWidget):
                         game["directory"] = selected_directory
                         directory = selected_directory
                         break
-                with open('settings.json', 'w') as f:
-                    json.dump({'games': self.games, 'lan_username': self.lan_username}, f, indent=4)
+                self.saveSettings()
 
         os.chdir(os.path.join(os.environ['LOCALAPPDATA'], 'Plutonium'))
         cmd = [f'{os.getcwd()}/bin/plutonium-bootstrapper-win32.exe', arg, directory, '+name', self.lan_username, '-lan']
+        
+        for global_arg in self.global_args:
+            cmd.append(global_arg)
+        
         subprocess.Popen(cmd)
         self.close()
 
@@ -223,20 +229,64 @@ class GameLauncher(QWidget):
         selected_directory = QFileDialog.getExistingDirectory(self, f"Select Directory for {game['arg']}", "")
         if selected_directory:
             game["directory"] = selected_directory
-            with open('settings.json', 'w') as f:
-                json.dump({'games': self.games, 'lan_username': self.lan_username}, f, indent=4)
+            self.saveSettings()
 
     def change_username(self):
         new_username, okPressed = QInputDialog.getText(self, "Change LAN Username", "Enter your new LAN Username:", QLineEdit.Normal, "")
         if okPressed and new_username != '':
             self.lan_username = new_username
             self.user_button.setText(f'User: {self.lan_username}')
-            with open('settings.json', 'w') as f:
-                json.dump({'games': self.games, 'lan_username': self.lan_username}, f, indent=4)
+            self.saveSettings()
 
     def closeEvent(self, event):
         self.settings.setValue("size", self.size())
         self.settings.setValue("pos", self.pos())
+        self.saveSettings()
+
+    def saveSettings(self):
+        selected_game_index = self.game_combobox.currentIndex()
+
+        with open('settings.json', 'r+') as f:
+            data = json.load(f)
+            data["auto_execute"] = self.auto_execute_checkbox.isChecked()
+            data["delay"] = self.delay_spinbox.value()
+            data["selected_index"] = selected_game_index
+            data["lan_username"] = self.lan_username
+            data["global_args"] = self.global_args
+            data["games"] = self.games
+            f.seek(0)
+            json.dump(data, f, indent=4)
+            f.truncate()
+
+    def addGlobalArg(self):
+        arg, okPressed = QInputDialog.getText(self, "Add Global Argument", "Enter the global argument:", QLineEdit.Normal, "")
+        if okPressed and arg.strip() != '':
+            self.global_args.append(arg)
+            self.saveSettings()
+            arg_button = StyledButton(arg)
+            self.layout().itemAt(1).widget().layout().addWidget(arg_button)
+
+    def removeGlobalArg(self):
+        if self.global_args:
+            arg, okPressed = QInputDialog.getItem(self, "Remove Global Argument", "Select the global argument to remove:", self.global_args, 0, False)
+            if okPressed:
+                self.global_args.remove(arg)
+                self.saveSettings()
+                scroll_layout = self.layout().itemAt(1).widget().layout()
+                for i in range(scroll_layout.count()):
+                    item = scroll_layout.itemAt(i)
+                    if item.widget().text() == arg:
+                        widget = item.widget()
+                        scroll_layout.removeWidget(widget)
+                        widget.deleteLater()
+                        break
+
+
+def prompt_lan_username():
+    username, okPressed = QInputDialog.getText(None, "Enter LAN Username", "Your LAN Username:", QLineEdit.Normal, "")
+    if okPressed and username != '':
+        return username
+    return None
 
 def main():
     with open('settings.json') as f:
@@ -253,13 +303,7 @@ def main():
         with open('settings.json', 'w') as f:
             json.dump({'games': games_data, 'lan_username': lan_username}, f, indent=4)
     launcher = GameLauncher(games_data, lan_username)
-    sys.exit(app.exec_())
-
-def prompt_lan_username():
-    username, okPressed = QInputDialog.getText(None, "Enter LAN Username", "Your LAN Username:", QLineEdit.Normal, "")
-    if okPressed and username != '':
-        return username
-    return None
+    app.exec_()
 
 if __name__ == '__main__':
     main()
