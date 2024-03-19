@@ -59,9 +59,9 @@
         "+cg_fovscale 1.4"
     ],
     "selected_game": {
-        "arg": "iw5mp",
-        "directory": "D:/SteamLibrary/steamapps/common/Call of Duty Modern Warfare 3",
+        "arg": "t4sp",
+        "directory": "D:/SteamLibrary/steamapps/common/Call of Duty World at War",
         "game_specific_args": [],
-        "name": "Call of Duty Modern Warfare III Multiplayer"
+        "name": "Call of Duty World at War Single Player"
     }
 }
