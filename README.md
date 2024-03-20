@@ -12,6 +12,7 @@ a gui launcher for the cod client [Plutonium]([https://store.steampowered.com/ag
 *   Auto exec options, with delay
 *   Remembers windows size and position upon closing and reopening
 *   Modular Button Lists (can easily remove unwanted buttons via settings.json)
+*   Section for global args that get passed to every game run through the gui
 
 <h2>💻 Built with</h2>
 
