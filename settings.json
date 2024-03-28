@@ -51,6 +51,7 @@
     ],
     "lan_username": "Mythical",
     "auto_execute": false,
+    "use_plutonium_staging": false,
     "delay": 1.0,
     "selected_index": 1,
     "global_args": [
