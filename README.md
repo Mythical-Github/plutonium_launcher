@@ -1,6 +1,6 @@
 <h1 id="title" align="left">plutonium_launcher</h1>
 
-a gui launcher for the cod client [Plutonium]([https://store.steampowered.com/agecheck/app/232090/](https://plutonium.pw/))
+an unofficial gui launcher for the cod client [Plutonium]([https://store.steampowered.com/agecheck/app/232090/](https://plutonium.pw/))
 
 <h2>Project Example:</h2>
 
