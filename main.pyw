@@ -52,6 +52,7 @@ class StyledButton(QPushButton):
         self.original_style = f"QPushButton {{background: {gradient_str}; color: white; border: 1px solid black; border-radius: 5px;}}"
         self.setStyleSheet(self.original_style)
 
+
 class GameLauncher(QWidget):
     def __init__(self, games, lan_username):
         super().__init__()
@@ -103,10 +104,10 @@ class GameLauncher(QWidget):
         global_args_scroll.setWidget(global_args_widget)
         global_args_scroll.setMaximumHeight(80)
         
-        add_arg_button = QPushButton("Add Global Argument")
+        add_arg_button = StyledButton("Add Global Argument")
         add_arg_button.clicked.connect(self.addGlobalArg)
 
-        remove_arg_button = QPushButton("Remove Global Argument")
+        remove_arg_button = StyledButton("Remove Global Argument")
         remove_arg_button.clicked.connect(self.removeGlobalArg)
 
         button_layout = QVBoxLayout()
@@ -258,6 +259,7 @@ class GameLauncher(QWidget):
             json.dump(data, f, indent=4)
             f.truncate()
 
+
     def addGlobalArg(self):
         arg, okPressed = QInputDialog.getText(self, "Add Global Argument", "Enter the global argument:", QLineEdit.Normal, "")
         if okPressed and arg.strip() != '':
@@ -265,6 +267,7 @@ class GameLauncher(QWidget):
             self.saveSettings()
             arg_button = StyledButton(arg)
             self.layout().itemAt(1).widget().layout().addWidget(arg_button)
+
 
     def removeGlobalArg(self):
         if self.global_args:
