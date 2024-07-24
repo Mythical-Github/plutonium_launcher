@@ -92,6 +92,19 @@ class GameLauncher(QWidget):
         self.user_button.clicked.connect(self.change_username)
         layout.addWidget(self.user_button)
 
+        # Add new horizontal layout with two buttons
+        link_buttons_layout = QHBoxLayout()
+
+        docs_button = StyledButton("Plutonium Docs", highlightable=False)
+        docs_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://plutonium.pw/docs/")))
+        link_buttons_layout.addWidget(docs_button)
+
+        forums_button = StyledButton("Plutonium Forums", highlightable=False)
+        forums_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://forum.plutonium.pw/")))
+        link_buttons_layout.addWidget(forums_button)
+
+        layout.addLayout(link_buttons_layout)
+
         global_args_scroll = QScrollArea()
         global_args_widget = QWidget()
         global_args_layout = QVBoxLayout(global_args_widget)
@@ -283,6 +296,7 @@ class GameLauncher(QWidget):
                         scroll_layout.removeWidget(widget)
                         widget.deleteLater()
                         break
+
 
 
 def prompt_lan_username():
