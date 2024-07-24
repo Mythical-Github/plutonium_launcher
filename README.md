@@ -13,6 +13,7 @@ an unofficial gui launcher for the cod client [Plutonium]([https://store.steampo
 *   Remembers windows size and position upon closing and reopening
 *   Modular Button Lists (can easily remove unwanted buttons via settings.json)
 *   Section for global args that get passed to every game run through the gui
+*   Plutonium Docs and Forum Buttons
 
 <h2>💻 Built with</h2>
 
