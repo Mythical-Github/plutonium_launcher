@@ -4,8 +4,8 @@ an unofficial gui launcher for the cod client [Plutonium]([https://store.steampo
 
 <h2>Project Example:</h2>
 
-![example](https://github.com/Mythical-Github/plutonium_launcher/assets/67753356/6e3e6544-f90b-47d1-ba70-09b0f158fbf6)
-  
+![example](https://github.com/user-attachments/assets/68657875-b4f3-4d47-a77d-5d36c8080161)
+
 <h2>💪 Features</h2>
 
 *   Alternate GUI for plutonium (currently lan only)
@@ -13,6 +13,7 @@ an unofficial gui launcher for the cod client [Plutonium]([https://store.steampo
 *   Remembers windows size and position upon closing and reopening
 *   Modular Button Lists (can easily remove unwanted buttons via settings.json)
 *   Section for global args that get passed to every game run through the gui
+*   Plutonium Docs and Forum Buttons
 
 <h2>💻 Built with</h2>
 
