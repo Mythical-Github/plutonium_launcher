@@ -2,9 +2,20 @@ import os
 import sys
 import json
 import subprocess
+from pathlib import Path
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+
+
+if getattr(sys, 'frozen', False):
+    script_dir = Path(sys.executable).parent
+else:
+    script_dir = Path(__file__).resolve().parent
+
+
+SETTINGS_JSON = f'{script_dir}/settings.json'
+
 
 color_1 = "color: white; border: 1px solid teal"
 style_1 = f"background: #222222; {color_1};"
@@ -65,7 +76,7 @@ class GameLauncher(QWidget):
         self.resize(self.settings.value("size", QSize(400, 200)))
         self.move(self.settings.value("pos", QPoint(100, 100)))
 
-        with open('settings.json') as f:
+        with open(SETTINGS_JSON) as f:
             data = json.load(f)
             self.selected_game = data.get('selected_game', self.games[0])
             self.delay = data.get('delay', 1.0) 
@@ -260,7 +271,7 @@ class GameLauncher(QWidget):
     def saveSettings(self):
         selected_game_index = self.game_combobox.currentIndex()
 
-        with open('settings.json', 'r+') as f:
+        with open(SETTINGS_JSON, 'r+') as f:
             data = json.load(f)
             data["auto_execute"] = self.auto_execute_checkbox.isChecked()
             data["delay"] = self.delay_spinbox.value()
@@ -306,7 +317,7 @@ def prompt_lan_username():
     return None
 
 def main():
-    with open('settings.json') as f:
+    with open(SETTINGS_JSON) as f:
         data = json.load(f)
         games_data = data['games']
         lan_username = data.get('lan_username', '')
@@ -317,7 +328,7 @@ def main():
         if not lan_username:
             print("LAN username not provided. Exiting.")
             sys.exit(1)
-        with open('settings.json', 'w') as f:
+        with open(SETTINGS_JSON, 'w') as f:
             json.dump({'games': games_data, 'lan_username': lan_username}, f, indent=4)
     launcher = GameLauncher(games_data, lan_username)
     app.exec_()
